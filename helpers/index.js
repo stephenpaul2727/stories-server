@@ -7,4 +7,6 @@ const isEmpty = function(obj) {
   return true;
 }
 
-module.exports = isEmpty
+module.exports = {
+  isEmpty,
+}
