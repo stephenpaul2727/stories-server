@@ -24,30 +24,33 @@ router.get('/posts',function(req,res) {
 });
 
 router.get('/posts/:id',function(req,res) {
-  const findObject = {
-    _id: mongo.ObjectId(req.params.id)
-  }
-  db.posts.find(findObject, function(err,posts) {
-    if(err) {
-      res.send("Unable to fetch posts");
-    }
-    else {
-      res.json(posts);
-    }
-  })
+  db.posts.find({_id: mongo.ObjectId(req.params.id)}, function(err,post) {
+    if(err || !post) res.status(400).json({"error":err});
+    else res.json({"status":"success","message":post})
+  });
 });
 
 router.post('/posts', function(req,res) {
   console.log(req.body);
-  res.send({"status":"success"});
+  db.posts.save(req.body, function(err, savedPost) {
+    if(err || !savedPost) res.status(400).json({"error": err});
+    else res.json({"status":"success","message":savedPost});
+  })
 });
 
 router.put('/posts/:id', function(req,res) {
-  res.send("THIS IS AN UPDATE REQUEST");
+  console.log("Modifying "+mongo.ObjectId(req.params.id));
+  db.posts.remove({_id :mongo.ObjectId(req.params.id)});
+  db.posts.save(req.body,function(err,post){
+    if(err || !post) res.status(400).json({"error":err});
+    else res.json({"status":"success","message":post});
+  });
 })
 
 router.delete('/posts/:id', function(req, res) {
-  res.send("THIS IS A DELETE REQUEST");
+  console.log("Deleting "+mongo.ObjectId(req.params.id));
+  db.posts.remove({_id: mongo.ObjectId(req.params.id)});
+  res.json({"status":"success"});
 })
 
 module.exports = router;
